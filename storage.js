@@ -201,17 +201,6 @@ export default class Storage {
         this.cache[key] = ret;
       }
     }
-    let now = new Date().getTime();
-    if(ret.expires < now) {
-      if (autoSync && this.sync[key]){
-        if(syncInBackground) {
-          this.sync[key]({ syncParams });
-          return Promise.resolve(ret.rawData);
-        }
-        return new Promise((resolve, reject) => this.sync[key]({ resolve, reject, syncParams }));
-      }
-      return Promise.reject(new ExpiredError(JSON.stringify(params)));
-    }
     return Promise.resolve(ret.rawData);
   }
   _noItemFound(params) {
@@ -236,20 +225,6 @@ export default class Storage {
       if (this.enableCache) {
         this.cache[newId] = ret;
       }
-    }
-    let now = new Date().getTime();
-    if(ret.expires < now) {
-      if(autoSync && this.sync[key]) {
-        if(syncInBackground) {
-          this.sync[key]({ id, syncParams });
-          return Promise.resolve(ret.rawData);
-        }
-        return new Promise((resolve, reject) => this.sync[key]({ id, resolve, reject, syncParams }));
-      }
-      if(batched) {
-        return Promise.resolve({ syncId: id });
-      }
-      return Promise.reject(new ExpiredError(JSON.stringify(params)));
     }
     return Promise.resolve(ret.rawData);
   }
